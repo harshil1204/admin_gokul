@@ -19,10 +19,11 @@ class _AddProductState extends State<AddProduct> {
   final TextEditingController _productNameController = TextEditingController();
   final TextEditingController _productDescController = TextEditingController();
   final TextEditingController _productExtraController = TextEditingController();
+  final TextEditingController _productStatusController = TextEditingController();
 
   String? imageUrl;
 
-  void addProductToFirestore(String productName,String productPrice,String desc,String extra) async {
+  void addProductToFirestore(String productName,String productPrice,String desc,String extra,String status) async {
     FirebaseFirestore firestore = FirebaseFirestore.instance;
 
     try {
@@ -33,6 +34,7 @@ class _AddProductState extends State<AddProduct> {
         'url':imageUrl,
         'extra':extra,
         'description':desc,
+        'inStock':status,
         'time ': DateTime.now(),
         // Add more fields related to the category if needed
       });
@@ -152,13 +154,15 @@ class _AddProductState extends State<AddProduct> {
                   String productPrice = _productPriceController.text.trim();
                   String productDesc = _productDescController.text.trim();
                   String productExtra = _productExtraController.text.trim();
+                  String productStatus = _productStatusController.text.trim();
                   //uploadImage();
                   if (productName.isNotEmpty && productPrice.isNotEmpty && imageUrl!.isNotEmpty && productDesc.isNotEmpty && productExtra.isNotEmpty) {
-                    addProductToFirestore(productName,productPrice,productDesc,productExtra);
+                    addProductToFirestore(productName,productPrice,productDesc,productExtra,productStatus);
                     _productNameController.clear();
                     _productPriceController.clear();
                     _productDescController.clear();
                     _productExtraController.clear();
+                    _productStatusController.clear();
                     imageUrl="";
                   }
                 },

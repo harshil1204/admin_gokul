@@ -20,6 +20,7 @@ class _UpdateProductState extends State<UpdateProduct> {
   final TextEditingController _productNameController = TextEditingController();
   final TextEditingController _productDescController = TextEditingController();
   final TextEditingController _productExtraController = TextEditingController();
+  final TextEditingController _productStatusController = TextEditingController();
   String? imageUrl;
   @override
   void initState() {
@@ -27,6 +28,7 @@ class _UpdateProductState extends State<UpdateProduct> {
     _productPriceController.text=widget.snapShot['price'];
     _productDescController.text=widget.snapShot['description'];
     _productExtraController.text=widget.snapShot['extra'];
+    _productStatusController.text=widget.snapShot['inStock'];
     imageUrl=widget.snapShot['url'];
     // TODO: implement initState
     super.initState();
@@ -54,7 +56,7 @@ class _UpdateProductState extends State<UpdateProduct> {
     }
   }
 
-  void updateProductDetails(String productName,String price,String desc,String extra) async {
+  void updateProductDetails(String productName,String price,String desc,String extra,String status) async {
     FirebaseFirestore firestore = FirebaseFirestore.instance;
 
     try {
@@ -63,7 +65,8 @@ class _UpdateProductState extends State<UpdateProduct> {
         'price': price,
         'url': imageUrl,
         'extra': extra,
-        'description':desc
+        'description':desc,
+        'inStock':status,
         // Add more fields to update if needed
       });
       Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => MainPageProduct(),));
@@ -165,13 +168,15 @@ class _UpdateProductState extends State<UpdateProduct> {
                   String productPrice = _productPriceController.text.trim();
                   String productDesc = _productDescController.text.trim();
                   String productExtra = _productExtraController.text.trim();
+                  String productStatus = _productExtraController.text.trim();
                   //uploadImage();
-                  if (productName.isNotEmpty && productPrice.isNotEmpty && productExtra.isNotEmpty && imageUrl!.isNotEmpty && productDesc.isNotEmpty) {
-                    updateProductDetails(productName,productPrice,productDesc,productExtra);
+                  if (productName.isNotEmpty && productPrice.isNotEmpty&& productStatus.isNotEmpty && productExtra.isNotEmpty && imageUrl!.isNotEmpty && productDesc.isNotEmpty) {
+                    updateProductDetails(productName,productPrice,productDesc,productExtra,productStatus);
                     _productNameController.clear();
                     _productPriceController.clear();
                     _productDescController.clear();
                     _productExtraController.clear();
+                    _productStatusController.clear();
                     imageUrl="";
                   }
                 },
