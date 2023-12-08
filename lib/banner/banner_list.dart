@@ -1,3 +1,4 @@
+import 'package:admin_gokul/banner/add_banner.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -12,7 +13,18 @@ class BannerListPage extends StatefulWidget {
 class _BannerListPageState extends State<BannerListPage> {
   @override
   Widget build(BuildContext context) {
+
     return Scaffold(
+      appBar: AppBar(
+        title: const Text("Add Banner"),
+        actions: [
+          InkWell(
+              onTap: (){
+                Navigator.push(context, MaterialPageRoute(builder: (context) => const AddBanner(),));
+              },
+              child: const Icon(Icons.add))
+        ],
+      ),
       body: FutureBuilder(
         future: FirebaseFirestore.instance.collection('Banner').get(),
         builder: (context, snapshot) {

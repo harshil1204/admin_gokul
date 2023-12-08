@@ -32,7 +32,8 @@ class _AddProductState extends State<AddProduct> {
         'price':productPrice,
         'url':imageUrl,
         'extra':extra,
-        'description':desc
+        'description':desc,
+        'time ': DateTime.now(),
         // Add more fields related to the category if needed
       });
       Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const MainPageProduct(),));
