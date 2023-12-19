@@ -1,3 +1,4 @@
+import 'package:admin_gokul/config/config.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
@@ -82,109 +83,126 @@ class _UpdateProductState extends State<UpdateProduct> {
       appBar: AppBar(
         title: Text("Update the product details"),
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16),
-        child: SingleChildScrollView(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            // crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              // TextField(
-              //   controller: _categoryIdController,
-              //   decoration: const InputDecoration(
-              //     labelText: 'Category id',
-              //     border: OutlineInputBorder(),
-              //   ),
-              // ),
-              const SizedBox(height: 30,),
+      body: Stack(
+        children: [
+          Opacity(
+              opacity: MyConfig.opacity,
+              child: Image.asset(MyConfig.bg,fit: BoxFit.cover,height: double.infinity,width: double.infinity )),
+          Padding(
+            padding: const EdgeInsets.all(16),
+            child: SingleChildScrollView(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                // crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  // TextField(
+                  //   controller: _categoryIdController,
+                  //   decoration: const InputDecoration(
+                  //     labelText: 'Category id',
+                  //     border: OutlineInputBorder(),
+                  //   ),
+                  // ),
+                  const SizedBox(height: 30,),
 
-              TextField(
-                controller: _productNameController,
-                decoration: const InputDecoration(
-                  labelText: 'Product Name',
-                  border: OutlineInputBorder(),
-                ),
-              ),
-              const SizedBox(height: 10,),
-              TextField(
-                keyboardType:TextInputType.number,
-                controller: _productPriceController,
-                decoration: const InputDecoration(
-                  labelText: 'Product weight',
-                  border: OutlineInputBorder(),
-                ),
-              ),
-              const SizedBox(height: 10,),
-              TextField(
-                keyboardType:TextInputType.number,
-                controller: _productExtraController,
-                decoration: const InputDecoration(
-                  labelText: 'Extra price',
-                  border: OutlineInputBorder(),
-                ),
-              ),
-              const SizedBox(height: 10,),
-              TextField(
-                maxLines: 4,
-                controller: _productDescController,
-                decoration: const InputDecoration(
-                  labelText: 'Product Description',
-                  border: OutlineInputBorder(),
-                ),
-              ),
-              const SizedBox(height: 10,),
-              // Text("Select image.."),
-              InkWell(
-                onTap: (){
-                  uploadImage();
-                },
-                child: Container(
-                    margin: const EdgeInsets.all(15),
-                    padding: const EdgeInsets.all(40),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: const BorderRadius.all(
-                        Radius.circular(15),
-                      ),
-                      border: Border.all(color: Colors.white),
-                      boxShadow: const [
-                        BoxShadow(
-                          color: Colors.black12,
-                          offset: Offset(2, 2),
-                          spreadRadius: 2,
-                          blurRadius: 1,
-                        ),
-                      ],
+                  TextField(
+                    controller: _productNameController,
+                    decoration: const InputDecoration(
+                      labelText: 'Product Name',
+                      border: OutlineInputBorder(),
                     ),
-                    child: (imageUrl == null)
-                        ? const Icon(Icons.photo)
-                        : Image.network(imageUrl.toString(),height: 50,fit: BoxFit.fill,)
-                ),
+                  ),
+                  const SizedBox(height: 10,),
+                  TextField(
+                    keyboardType:TextInputType.number,
+                    controller: _productPriceController,
+                    decoration: const InputDecoration(
+                      labelText: 'Product weight',
+                      border: OutlineInputBorder(),
+                    ),
+                  ),
+                  const SizedBox(height: 10,),
+                  TextField(
+                    keyboardType:TextInputType.number,
+                    controller: _productExtraController,
+                    decoration: const InputDecoration(
+                      labelText: 'Extra price',
+                      border: OutlineInputBorder(),
+                    ),
+                  ),
+                  const SizedBox(height: 10,),
+
+                  TextField(
+                    controller: _productStatusController,
+                    decoration: const InputDecoration(
+                      labelText: 'Product status',
+                      border: OutlineInputBorder(),
+                    ),
+                  ),
+                  const SizedBox(height: 10,),
+                  TextField(
+                    maxLines: 4,
+                    controller: _productDescController,
+                    decoration: const InputDecoration(
+                      labelText: 'Product Description',
+                      border: OutlineInputBorder(),
+                    ),
+                  ),
+
+                  const SizedBox(height: 10,),
+                  // Text("Select image.."),
+                  InkWell(
+                    onTap: (){
+                      uploadImage();
+                    },
+                    child: Container(
+                        margin: const EdgeInsets.all(15),
+                        padding: const EdgeInsets.all(40),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: const BorderRadius.all(
+                            Radius.circular(15),
+                          ),
+                          border: Border.all(color: Colors.white),
+                          boxShadow: const [
+                            BoxShadow(
+                              color: Colors.black12,
+                              offset: Offset(2, 2),
+                              spreadRadius: 2,
+                              blurRadius: 1,
+                            ),
+                          ],
+                        ),
+                        child: (imageUrl == null)
+                            ? const Icon(Icons.photo)
+                            : Image.network(imageUrl.toString(),height: 50,fit: BoxFit.fill,)
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+                  ElevatedButton(
+                    onPressed: () {
+                      String productName = _productNameController.text.trim();
+                      String productPrice = _productPriceController.text.trim();
+                      String productDesc = _productDescController.text.trim();
+                      String productExtra = _productExtraController.text.trim();
+                      String productStatus = _productStatusController.text.trim();
+                      //uploadImage();
+                      if (productName.isNotEmpty && productPrice.isNotEmpty&& productStatus.isNotEmpty && productExtra.isNotEmpty && imageUrl!.isNotEmpty && productDesc.isNotEmpty) {
+                        updateProductDetails(productName,productPrice,productDesc,productExtra,productStatus);
+                        _productNameController.clear();
+                        _productPriceController.clear();
+                        _productDescController.clear();
+                        _productExtraController.clear();
+                        _productStatusController.clear();
+                        imageUrl="";
+                      }
+                    },
+                    child: const Text('Update Category'),
+                  ),
+                ],
               ),
-              const SizedBox(height: 20),
-              ElevatedButton(
-                onPressed: () {
-                  String productName = _productNameController.text.trim();
-                  String productPrice = _productPriceController.text.trim();
-                  String productDesc = _productDescController.text.trim();
-                  String productExtra = _productExtraController.text.trim();
-                  String productStatus = _productExtraController.text.trim();
-                  //uploadImage();
-                  if (productName.isNotEmpty && productPrice.isNotEmpty&& productStatus.isNotEmpty && productExtra.isNotEmpty && imageUrl!.isNotEmpty && productDesc.isNotEmpty) {
-                    updateProductDetails(productName,productPrice,productDesc,productExtra,productStatus);
-                    _productNameController.clear();
-                    _productPriceController.clear();
-                    _productDescController.clear();
-                    _productExtraController.clear();
-                    _productStatusController.clear();
-                    imageUrl="";
-                  }
-                },
-                child: const Text('Update Category'),
-              ),
-            ],
+            ),
           ),
-        ),
+        ],
       ),
     );
   }

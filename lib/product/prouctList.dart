@@ -1,5 +1,8 @@
+import 'package:admin_gokul/config/config.dart';
 import 'package:admin_gokul/product/updateProduct.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 
 import 'add_product.dart';
@@ -16,12 +19,11 @@ String cat_id;
 
 class _ProductListState extends State<ProductList> {
 
-  void deleteProduct(String productId) async {
+  void deleteProduct(String productId,String url) async {
     FirebaseFirestore firestore = FirebaseFirestore.instance;
-
     try {
       await firestore.collection('Products').doc(productId).delete();
-
+      await FirebaseStorage.instance.refFromURL(url).delete().then((value) => print("delete"));
       print('Product deleted successfully');
       Navigator.pop(context); // Close the dialog after deletion
     } catch (e) {
@@ -44,85 +46,89 @@ class _ProductListState extends State<ProductList> {
       body: FutureBuilder<QuerySnapshot>(
           future: FirebaseFirestore.instance.collection('Products').where('id', isEqualTo: widget.cat_id).get(),
           builder: (context, snapshot) {
-            if(snapshot.connectionState == ConnectionState.done){
+            if (snapshot.connectionState == ConnectionState.done) {
               print(snapshot.data!.docs);
               return Stack(
                 children: [
+                  Opacity(
+                      opacity: MyConfig.opacity,
+                      child: Image.asset(MyConfig.bg,fit: BoxFit.fill,height: double.infinity )),
                   Padding(
                     padding: const EdgeInsets.all(8.0),
-                    child: GridView.builder(
-                      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                          crossAxisCount: 2,crossAxisSpacing:8,mainAxisSpacing: 8
-                      ),
-                      itemCount: snapshot.data!.docs.length,
-                      itemBuilder: (context, index) {
-                        return InkWell(
-                          onTap: (){
-                            Navigator.push(context, MaterialPageRoute(builder: (context) =>  UpdateProduct(snapShot: snapshot.data!.docs[index],id: snapshot.data!.docs[index].id),));
-                          },
-                          child: Container(
-                            padding: EdgeInsets.symmetric(horizontal: 4),
-                            decoration: BoxDecoration(
-                              border: Border.all(color: Colors.black),
-                                borderRadius: BorderRadius.circular(9)
-                            ),
-                            child: Column(
-                              children: [
-                                SizedBox(height:83,child: Image.network(snapshot.data!.docs[index]['url'].toString(),fit: BoxFit.fill)),
-                                Container(
-                                  width: double.infinity,
-                                  //padding: const EdgeInsets.symmetric(horizontal:20,vertical: 10),
-                                  decoration: const BoxDecoration(
-                                      color: Colors.grey,
-                                      borderRadius: BorderRadius.only(
-                                          bottomRight: Radius.circular(9),bottomLeft: Radius.circular(9))
-                                  ),
-                                  child: Column(
-                                    children: [
-                                      Text("name:${snapshot.data!.docs[index]['name'].toString() ?? ''}",maxLines: 1,style: const TextStyle(
-                                          fontWeight: FontWeight.w400,
-                                          fontSize: 16,
-                                          color: Colors.white
-                                      ),),
-                                      Text("Weight:${snapshot.data!.docs[index]['price'].toString() ?? ''}",style: const TextStyle(
-                                          fontWeight: FontWeight.w400,
-                                          fontSize: 16,
-                                          color: Colors.white
-                                      ),),
-                                      Text("extra:${snapshot.data!.docs[index]['extra'].toString() ?? ''}",style: const TextStyle(
-                                          fontWeight: FontWeight.w400,
-                                          fontSize: 16,
-                                          color: Colors.white
-                                      ),),
-                                      InkWell(
-                                        onTap: (){
-                                          deleteProduct(snapshot.data!.docs[index].id.toString());
-                                        },
-                                        child: Icon(Icons.delete,),
+                    child: Column(
+                      children: [
+                        const SizedBox(
+                          height: 9,
+                        ),
+                        Expanded(
+                          child: GridView.builder(
+                            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(childAspectRatio: 0.8,crossAxisCount: 2, crossAxisSpacing: 18, mainAxisSpacing: 14),
+                            itemCount: snapshot.data!.docs.length,
+                            itemBuilder: (context, index) {
+                              var data = snapshot.data!.docs[index];
+                              return Stack(
+                                children: [
+                                  InkWell(
+                                    onTap: () {
+                                      Navigator.push(context, MaterialPageRoute(builder: (context) =>  UpdateProduct(snapShot: snapshot.data!.docs[index],id: snapshot.data!.docs[index].id),));
+                                    },
+                                    child: Container(
+                                      decoration: BoxDecoration(/*border: Border.all(width: 1, color: Colors.black), */borderRadius: BorderRadius.circular(9)),
+                                      child: Column(
+                                        children: [
+                                          Container(
+                                              height: 170,
+                                              width: double.infinity,
+                                              clipBehavior: Clip.hardEdge,
+                                              decoration: BoxDecoration(
+                                                  borderRadius: BorderRadius.circular(20)
+                                              ),
+                                              child:CachedNetworkImage(imageUrl: data['url'],
+                                                fit: BoxFit.fill,
+                                                placeholder: (context, url) => Image.asset("assets/images/loading.png",width: double.infinity,
+                                                  fit: BoxFit.fill,),
+                                              )),
+                                          Expanded(
+                                            child: Container(
+                                              decoration: BoxDecoration(
+                                                //color: Colors.grey,
+                                                  borderRadius: BorderRadius.circular(9)
+                                              ),
+                                              width: double.infinity,
+                                              child: Center(
+                                                child: Text(
+                                                  data['name'].toString() ?? '',
+                                                  style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 18, color: Colors.black),
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                        ],
                                       ),
-                                      SizedBox(height: 5,),
-                                    ],
+                                    ),
                                   ),
-                                ),
-                              ],
-                            ),
+                                  Align(
+                                    alignment: Alignment.topRight,
+                                    child: IconButton(onPressed: (){
+                                      deleteProduct(snapshot.data!.docs[index].id,snapshot.data!.docs[index]['url']);
+                                    }, icon: const Icon(Icons.delete)),
+                                  ),
+                                ],
+                              );
+                            },
                           ),
-                        );
-                      },
+                        )
+                      ],
                     ),
                   ),
                 ],
               );
-            }
-
-            else if (snapshot.hasError) {
+            } else if (snapshot.hasError) {
               return Center(child: Text('Error: ${snapshot.error}'));
+            } else {
+              return const Center(child: CircularProgressIndicator(color: Colors.grey,));
             }
-            else{
-              return const Center(child: CircularProgressIndicator());
-            }
-          }
-      ),
+          }),
     );
   }
 }

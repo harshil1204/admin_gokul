@@ -1,3 +1,4 @@
+import 'package:admin_gokul/config/config.dart';
 import 'package:admin_gokul/homepage.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
@@ -59,61 +60,61 @@ class _AddBannerState extends State<AddBanner> {
     return Scaffold(
       appBar: AppBar(
         title: const Text("Add Banner"),
-        actions: [
-          InkWell(
-              onTap: (){
-                //Navigator.push(context, MaterialPageRoute(builder: (context) => ,));
-              },
-              child: Icon(Icons.add))
-        ],
       ),
-      body: Center(
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              InkWell(
-                onTap: (){
-                  uploadImage();
-                },
-                child: Container(
-                  // height: 130,
-                    margin: EdgeInsets.all(15),
-                    padding: EdgeInsets.all(15),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: const BorderRadius.all(
-                        Radius.circular(15),
-                      ),
-                      border: Border.all(color: Colors.white),
-                      boxShadow: const [
-                        BoxShadow(
-                          color: Colors.black12,
-                          offset: Offset(2, 2),
-                          spreadRadius: 2,
-                          blurRadius: 1,
+      body: Stack(
+        children: [
+          Opacity(
+              opacity: MyConfig.opacity,
+              child: Image.asset(MyConfig.bg,fit: BoxFit.fill,height: double.infinity ,width: double.infinity)),
+          Center(
+            child: Padding(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  InkWell(
+                    onTap: (){
+                      uploadImage();
+                    },
+                    child: Container(
+                      // height: 130,
+                        margin: EdgeInsets.all(15),
+                        padding: EdgeInsets.all(15),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: const BorderRadius.all(
+                            Radius.circular(15),
+                          ),
+                          border: Border.all(color: Colors.white),
+                          boxShadow: const [
+                            BoxShadow(
+                              color: Colors.black12,
+                              offset: Offset(2, 2),
+                              spreadRadius: 2,
+                              blurRadius: 1,
+                            ),
+                          ],
                         ),
-                      ],
+                        child: (imageUrl == null)
+                            ? const Icon(Icons.photo)
+                            : Image.network(imageUrl.toString(),height: 300,width:double.infinity,fit: BoxFit.fill,)
                     ),
-                    child: (imageUrl == null)
-                        ? const Icon(Icons.photo)
-                        : Image.network(imageUrl.toString(),height: 300,width:double.infinity,fit: BoxFit.fill,)
-                ),
+                  ),
+                  ElevatedButton(
+                    onPressed: () {
+                      if (imageUrl!.isNotEmpty) {
+                        addBannerToFirestore();
+                        imageUrl="";
+                      }
+                    },
+                    child: const Text('Add Banner'),
+                  ),
+                ],
               ),
-              ElevatedButton(
-                onPressed: () {
-                  if (imageUrl!.isNotEmpty) {
-                    addBannerToFirestore();
-                    imageUrl="";
-                  }
-                },
-                child: const Text('Add Banner'),
-              ),
-            ],
+            ),
           ),
-        ),
+        ],
       ),
     );
   }

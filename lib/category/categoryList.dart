@@ -1,4 +1,6 @@
 import 'package:admin_gokul/category/updateCat.dart';
+import 'package:admin_gokul/config/config.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
@@ -24,58 +26,82 @@ class _CategoryListState extends State<CategoryList> {
               icon: const Icon(Icons.add))
         ],
       ),
-      body:  FutureBuilder(
-        future: FirebaseFirestore.instance.collection('Categories').get(),
-        builder: (context, snapshot) {
-      if(snapshot.connectionState == ConnectionState.done){
-          return Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Column(
-              children: [
-                Expanded(
-                  child: ListView.builder(
-                    itemCount:snapshot.data!.docs.length ?? 0,
-                    physics: const AlwaysScrollableScrollPhysics(
-                        parent: BouncingScrollPhysics()
-                    ),
-                    itemBuilder:(context, index) {
-                      return Padding(
-                        padding:  const EdgeInsets.symmetric(vertical: 4.0),
-                        child: InkWell(
-                          onTap: (){
-                            Navigator.push(context, MaterialPageRoute(builder: (context) => UpdateCat(id:snapshot.data!.docs[index].id,name:snapshot.data!.docs[index]['name'] ),));
-                          },
-                          child: Card(
-                            elevation: 5,
-                            color: Colors.grey,
-                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                            child:  SizedBox(
-                              height: 60,width: double.infinity,
-                              child: Center(
-                                child: Padding(
-                                  padding: const EdgeInsets.all(8.0),
-                                  child: Text(snapshot.data!.docs![index]['name'].toString() ?? " ",maxLines: 1,style: const TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 16,
-                                  ),),
-                                ),
-                              ),
-                            ),
-                          ),
+      body: FutureBuilder<QuerySnapshot>(
+          future: FirebaseFirestore.instance.collection('Categories').get(),
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.done) {
+              print(snapshot.data!.docs);
+              return Stack(
+                children: [
+                  Opacity(
+                      opacity: MyConfig.opacity,
+                      child: Image.asset(MyConfig.bg,fit: BoxFit.fill,height: double.infinity )),
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Column(
+                      children: [
+                        const SizedBox(
+                          height: 9,
                         ),
-                      );
-                    },
+                        Expanded(
+                          child: GridView.builder(
+                            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(childAspectRatio: 0.8,crossAxisCount: 2, crossAxisSpacing: 18, mainAxisSpacing: 14),
+                            itemCount: snapshot.data!.docs.length,
+                            itemBuilder: (context, index) {
+                              var data = snapshot.data!.docs[index];
+                              return InkWell(
+                                onTap: () {
+                                  Navigator.push(context, MaterialPageRoute(builder: (context) => UpdateCat(id:snapshot.data!.docs[index].id,name:snapshot.data!.docs[index]['name'],url: snapshot.data!.docs[index]['url'], ),));
+                                },
+                                child: Container(
+                                  decoration: BoxDecoration(/*border: Border.all(width: 1, color: Colors.black), */borderRadius: BorderRadius.circular(9)),
+                                  child: Column(
+                                    children: [
+                                      Container(
+                                          height: 170,
+                                          width: double.infinity,
+                                          clipBehavior: Clip.hardEdge,
+                                          decoration: BoxDecoration(
+                                              borderRadius: BorderRadius.circular(20)
+                                          ),
+                                          child:CachedNetworkImage(imageUrl: data['url'],
+                                            fit: BoxFit.fill,
+                                            placeholder: (context, url) => Image.asset("assets/images/loading.png",width: double.infinity,
+                                              fit: BoxFit.fill,),
+                                          )),
+                                      Expanded(
+                                        child: Container(
+                                          decoration: BoxDecoration(
+                                            //color: Colors.grey,
+                                              borderRadius: BorderRadius.circular(9)
+                                          ),
+                                          width: double.infinity,
+                                          child: Center(
+                                            child: Text(
+                                              data['name'].toString() ?? '',
+                                              style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 18, color: Colors.black),
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              );
+                            },
+                          ),
+                        )
+                      ],
+                    ),
                   ),
-                ),
-              ],
-            ),
-          );
-      }
-      else{
-        return const Center(child: CircularProgressIndicator(color: Colors.grey,));
-      }
-        },
-      ),
+                ],
+              );
+            } else if (snapshot.hasError) {
+              return Center(child: Text('Error: ${snapshot.error}'));
+            } else {
+              return const Center(child: CircularProgressIndicator(color: Colors.grey,));
+            }
+          }),
     );
   }
 }
