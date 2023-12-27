@@ -1,4 +1,5 @@
 import 'package:admin_gokul/config/config.dart';
+import 'package:admin_gokul/homepage.dart';
 import 'package:admin_gokul/product/mainpage.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
@@ -27,7 +28,7 @@ class _AddGoldState extends State<AddGold> {
         'time': DateTime.now(),
         // Add more fields related to the category if needed
       });
-      Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const MainPageProduct(),));
+      Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const HomePge(),));
       print('Product added successfully');
     } catch (e) {
       print('Error adding category: $e');
@@ -85,12 +86,12 @@ class _AddGoldState extends State<AddGold> {
                       String productPrice = _productPriceController.text.trim();
                       String productKaret = _productKaretController.text.trim();
                       //uploadImage();
-                      if (productName.isNotEmpty && productPrice.isNotEmpty &&  productKaret.isNotEmpty) {
+                     // if (productName.isNotEmpty && productPrice.isNotEmpty &&  productKaret.isNotEmpty) {
                         addProductToFirestore(productName,productPrice,productKaret);
                         _productNameController.clear();
                         _productPriceController.clear();
                         _productKaretController.clear();
-                      }
+                     // }
                     },
                     child: const Text('Add Data'),
                   ),

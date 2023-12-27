@@ -1,4 +1,5 @@
 import 'package:admin_gokul/config/config.dart';
+import 'package:admin_gokul/homepage.dart';
 import 'package:admin_gokul/product/mainpage.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
@@ -30,7 +31,7 @@ class _UpdateGoldState extends State<UpdateGold> {
         'time':DateTime.now()
         // Add more fields to update if needed
       });
-      Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => MainPageProduct(),));
+      Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => HomePge(),));
       print('Product details updated successfully');
     } catch (e) {
       print('Error updating product details: $e');
